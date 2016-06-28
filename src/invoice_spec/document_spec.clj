@@ -1,0 +1,40 @@
+(ns invoice-spec.document-spec
+  (:require [clojure.spec :as s]
+            [clojure.spec.gen :as gen]
+            [invoice-spec.client-spec :as client-spec]))
+
+(s/def ::document (s/keys :req-un [::sequence-number ::serie
+                                   ::document-type
+                                   ::date ::due-date
+                                   :invoice-spec.client-spec/client
+                                   :invoice-spec.item-spec/items]))
+
+(s/def ::document-type #{nil "CreditNode" "DebitNote" "Receipt"})
+
+(s/def ::sequence-number (s/and integer? pos?))
+(s/def ::serie (s/with-gen string? #(s/gen #{"2016"})))
+(s/def ::date (s/with-gen string? #(s/gen #{"01/01/2016"})))
+(s/def ::due-date (s/with-gen string? #(s/gen #{"01/01/2016"})))
+
+(s/def ::transition #{
+                      [:cancel]
+                      [:pay ]
+                      [:debit-note]
+                      [:credit-note]
+                      })
+(s/def ::transitions (s/with-gen (s/+ ::transition)
+                                 #(gen/vector (s/gen ::transition) 1 5)))
+
+
+(comment
+  (gen/generate (s/gen ::document))
+  (def transitions-gen (s/gen ::transitions))
+
+  (gen/sample transitions-gen)
+
+  (gen/generate
+    (gen/bind (s/gen ::document) (fn [doc] (gen/tuple (gen/return doc)
+                                                     transitions-gen)))))
+
+
+
