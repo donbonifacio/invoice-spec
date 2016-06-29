@@ -1,4 +1,4 @@
-(ns invoice-spec.client-spec
+(ns invoice-spec.models.client
   (:require [clojure.spec :as s]
             [clojure.spec.gen :as gen]))
 

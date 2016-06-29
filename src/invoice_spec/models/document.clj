@@ -1,4 +1,4 @@
-(ns invoice-spec.document-spec
+(ns invoice-spec.models.document
   (:require [clojure.spec :as s]
             [clojure.spec.gen :as gen]
             [invoice-spec.client-spec :as client-spec]))
@@ -6,8 +6,8 @@
 (s/def ::document (s/keys :req-un [::sequence-number ::serie
                                    ::document-type
                                    ::date ::due-date
-                                   :invoice-spec.client-spec/client
-                                   :invoice-spec.item-spec/items]))
+                                   :invoice-spec.models.client/client
+                                   :invoice-spec.models.item/items]))
 
 (s/def ::document-type #{nil "CreditNode" "DebitNote" "Receipt"})
 

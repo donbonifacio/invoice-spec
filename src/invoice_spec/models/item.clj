@@ -1,4 +1,4 @@
-(ns invoice-spec.item-spec
+(ns invoice-spec.models.item
   (:require [clojure.spec :as s]
             [clojure.spec.gen :as gen]))
 
