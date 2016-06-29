@@ -1,7 +1,8 @@
 (ns invoice-spec.models.document
   (:require [clojure.spec :as s]
-            [clojure.spec.gen :as gen]
-            [invoice-spec.client-spec :as client-spec]))
+            [invoice-spec.models.client]
+            [invoice-spec.models.item]
+            [clojure.spec.gen :as gen]))
 
 (s/def ::document (s/keys :req-un [::sequence-number ::serie
                                    ::document-type
