@@ -4,15 +4,16 @@
             [invoice-spec.models.item]
             [clojure.spec.gen :as gen]))
 
-(s/def ::document (s/keys :req-un [::sequence-number ::serie
-                                   ::document-type
+(s/def ::document (s/keys :req-un [::sequence_number ::serie
+                                   ::type ::status
                                    ::date ::due-date
                                    :invoice-spec.models.client/client
                                    :invoice-spec.models.item/items]))
 
-(s/def ::document-type #{nil "CreditNode" "DebitNote" "Receipt"})
+(s/def ::type #{nil "CreditNode" "DebitNote" "Receipt"})
+(s/def ::status #{"draft" "sent" "settled" "canceled"})
 
-(s/def ::sequence-number (s/and integer? pos?))
+(s/def ::sequence_number (s/and integer? pos?))
 (s/def ::serie (s/with-gen string? #(s/gen #{"2016"})))
 (s/def ::date (s/with-gen string? #(s/gen #{"01/01/2016"})))
 (s/def ::due-date (s/with-gen string? #(s/gen #{"01/01/2016"})))
