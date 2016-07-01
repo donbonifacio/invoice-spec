@@ -13,6 +13,7 @@
 (deftest create-invoice-test
   (let [invoice (document/new-invoice)
         result (<!! (api/create invoice))]
+    (prn result)
     (is (result/succeeded? result))
     (is (s/valid? :invoice-spec.models.document/document result)
         (s/explain-str :invoice-spec.models.document/document result))))
