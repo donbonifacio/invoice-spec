@@ -4,7 +4,8 @@
 
 #_(gen/generate (s/gen ::item))
 
-(s/def ::items (s/+ ::item))
+(s/def ::items (s/with-gen (s/+ ::item)
+                           #(gen/vector (s/gen ::item) 1 3)))
 (s/def ::item (s/keys :req-un [::name ::description
                                ::quantity ::unit-price]))
 (s/def ::name (s/with-gen string? #(s/gen (->> (range 10) (map (fn [n] (str "Item " n))) (set)))))

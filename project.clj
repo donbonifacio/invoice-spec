@@ -8,5 +8,6 @@
                  [org.clojure/test.check "0.9.0"]
                  [aleph "0.4.1"]
                  [environ "1.0.3"]
+                 [walmartlabs/datascope "0.1.0"]
                  [weareswat/request-utils "0.4.1"]]
   :plugins [[lein-environ "1.0.3"]])

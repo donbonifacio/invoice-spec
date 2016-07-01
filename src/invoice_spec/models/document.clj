@@ -27,6 +27,8 @@
 (s/def ::transitions (s/with-gen (s/+ ::transition)
                                  #(gen/vector (s/gen ::transition) 1 5)))
 
+(defn random []
+  (gen/generate (s/gen :invoice-spec.models.document/document)))
 
 (comment
   (gen/generate (s/gen ::document))
