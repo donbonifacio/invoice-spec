@@ -5,6 +5,8 @@
             [request-utils.core :as request-utils]
             [invoice-spec.api :as api]
             [invoice-spec.models.document :as document]
+            [clojure.test.check.clojure-test :refer [defspec]]
+            [clojure.test.check.properties :as prop]
             [clojure.core.async :refer [chan <!! >!! close! go <! timeout]]
             [environ.core :refer [env]]
             [result.core :as result]
@@ -55,3 +57,11 @@
 (deftest change-state-body-test
   (is (= "<invoice><state>finalized</state></invoice>"
          (api/change-state-body {} {:state "finalized"}))))
+
+(defspec all-documents-finalize
+  1
+  (prop/for-all [document (document/document-generator)]
+                (let [created (<!! (api/create document))
+                      final (<!! (api/finalize created))]
+                  (= "final"
+                     (:status final)))))
