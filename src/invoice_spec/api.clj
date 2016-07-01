@@ -1,6 +1,8 @@
 (ns invoice-spec.api
   (:require [clojure.spec :as s]
             [clojure.spec.gen :as gen]
+            [request-utils.core :as request-utils]
+            [environ.core :refer [env]]
             [clojure.data.xml :as xml]))
 
 (defn document-xml [document]
@@ -26,4 +28,9 @@
 (defn document-xml-str [document]
   (xml/emit-str (document-xml document)))
 
+(defn url [path]
+  (str (env :ix-api-host) path "?api_key=" (env :ix-api-key)))
 
+(defn create [document]
+  (request-utils/http-post {:host (url "/invoices")
+                            :body (document-xml-str document)}))
