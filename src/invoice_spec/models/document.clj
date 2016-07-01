@@ -10,13 +10,21 @@
                                    ::sum ::discount ::taxes ::total
                                    ::archived ::permalink ::reference
                                    :invoice-spec.models.client/client
-                                   :invoice-spec.models.item/items]))
+                                   :invoice-spec.models.item/items]
+                          :opt-un [::saft_hash
+                                   ::currency
+                                   ::before_taxes]))
 
 (s/def ::type #{"Invoice" "CreditNode" "DebitNote" "Receipt"})
-(s/def ::status #{"draft" "sent" "settled" "canceled"})
+(s/def ::status #{"draft" "final" "settled" "canceled"})
 
-(s/def ::sequence_number (s/or :number (s/and integer? pos?)
-                               :draft #{"draft"}))
+(defn sequence-number? [raw]
+  (re-matches #"^\d+\/\w+" raw))
+
+(s/def ::sequence_number (s/with-gen
+                           (s/or :complete-number sequence-number?
+                                 :draft #{"draft"})
+                           #(s/gen #{"draft"})))
 (s/def ::date (s/with-gen string? #(s/gen #{"01/01/2016"})))
 (s/def ::due_date (s/with-gen string? #(s/gen #{"01/01/2016"})))
 
@@ -24,9 +32,13 @@
 (s/def ::sum number?)
 (s/def ::taxes number?)
 (s/def ::total number?)
+(s/def ::before_taxes number?)
 (s/def ::archived boolean?)
 (s/def ::permalink string?)
 (s/def ::reference (s/nilable string?))
+
+(s/def ::saft_hash (s/and string? #(= 4 (count %))))
+(s/def ::currency #{"Euro"})
 
 (s/def ::transition #{
                       [:cancel]

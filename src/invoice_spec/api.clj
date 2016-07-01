@@ -73,3 +73,25 @@
                                         :plain-body? true
                                         :body (document-xml-str document)}))]
       (result/success (load-from-xml (:body response))))))
+
+(defn reload-document [{:keys [id] :as document}]
+  {:pre [(some? id)]}
+  (go
+    (result/on-success [response (<! (request-utils/http-get
+                                       {:host (url (str "/invoices/" id ".xml"))
+                                        :headers {"Content-type" "application/xml; charset=utf-8"}
+                                        :plain-body? true}))]
+      (result/success (load-from-xml (:body response))))))
+
+(defn finalize [{:keys [id] :as document}]
+  {:pre [(some? id)]}
+  (go
+    (result/enforce-let [response (<! (request-utils/http-put
+                                         {:host (url (str "/invoice/" id "/change-state.xml"))
+                                          :headers {"Content-type" "application/xml; charset=utf-8"}
+                                          :plain-body? true
+                                          :body (str "<invoice>"
+                                                      "<state>finalized</state>"
+                                                     "</invoice>")}))
+                         document (<! (reload-document document))]
+        document)))

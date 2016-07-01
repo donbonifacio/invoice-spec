@@ -10,9 +10,19 @@
             [result.core :as result]
             [clojure.data.xml :as xml]))
 
+(defn is-valid-document? [document]
+  (is (s/valid? :invoice-spec.models.document/document document)
+      (s/explain-str :invoice-spec.models.document/document document)))
+
 (deftest create-invoice-test
-  (let [invoice (document/new-invoice)
-        result (<!! (api/create invoice))]
-    (is (result/succeeded? result))
-    (is (s/valid? :invoice-spec.models.document/document result)
-        (s/explain-str :invoice-spec.models.document/document result))))
+  (testing "creating an invoice"
+    (let [invoice (document/new-invoice)
+          result (<!! (api/create invoice))]
+      (is (result/succeeded? result))
+      (is-valid-document? result)
+
+      (testing "finalizing an invoice"
+        (let [result (<!! (api/finalize result))]
+          (prn result)
+          (is (result/succeeded? result))
+          (is-valid-document? result))))))
