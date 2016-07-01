@@ -7,9 +7,9 @@
 (s/def ::items (s/with-gen (s/+ ::item)
                            #(gen/vector (s/gen ::item) 1 3)))
 (s/def ::item (s/keys :req-un [::name ::description
-                               ::quantity ::unit-price]))
+                               ::quantity ::unit_price]))
 (s/def ::name (s/with-gen string? #(s/gen (->> (range 10) (map (fn [n] (str "Item " n))) (set)))))
-(s/def ::description string?)
+(s/def ::description (s/nilable string?))
 (s/def ::quantity (s/and number? #(<= 1 % 100)))
-(s/def ::unit-price (s/and number? #(<= 1 % 100)))
+(s/def ::unit_price (s/and number? #(<= 1 % 100)))
 

@@ -8,4 +8,4 @@
 (defn show-document [document]
   (ds/view document))
 
-#_(show-document (document/random))
+#_(show-document (document/random-new))

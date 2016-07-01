@@ -4,7 +4,8 @@
 
 #_(gen/sample (s/gen ::client))
 
-(s/def ::client (s/keys :req-un [::name ::code ::email ::language]))
+(s/def ::client (s/keys :req-un [::name]
+                        :opt-un [::email ::language ::code]))
 
 (s/def ::name (s/with-gen string? #(s/gen #{"Pedro" "António" "Zé"})))
 (s/def ::code (s/with-gen string? #(s/gen (->> (range 10) (map (fn [n] (str "Client " n))) (set)))))

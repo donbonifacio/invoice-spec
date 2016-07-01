@@ -4,19 +4,19 @@
             [invoice-spec.models.item]
             [clojure.spec.gen :as gen]))
 
-(s/def ::document (s/keys :req-un [::sequence_number ::serie
+(s/def ::document (s/keys :req-un [::sequence_number
                                    ::type ::status
-                                   ::date ::due-date
+                                   ::date ::due_date
                                    :invoice-spec.models.client/client
                                    :invoice-spec.models.item/items]))
 
-(s/def ::type #{nil "CreditNode" "DebitNote" "Receipt"})
+(s/def ::type #{"Invoice" "CreditNode" "DebitNote" "Receipt"})
 (s/def ::status #{"draft" "sent" "settled" "canceled"})
 
-(s/def ::sequence_number (s/and integer? pos?))
-(s/def ::serie (s/with-gen string? #(s/gen #{"2016"})))
+(s/def ::sequence_number (s/or :number (s/and integer? pos?)
+                               :draft #{"draft"}))
 (s/def ::date (s/with-gen string? #(s/gen #{"01/01/2016"})))
-(s/def ::due-date (s/with-gen string? #(s/gen #{"01/01/2016"})))
+(s/def ::due_date (s/with-gen string? #(s/gen #{"01/01/2016"})))
 
 (s/def ::transition #{
                       [:cancel]
@@ -27,10 +27,21 @@
 (s/def ::transitions (s/with-gen (s/+ ::transition)
                                  #(gen/vector (s/gen ::transition) 1 5)))
 
-(defn random []
-  (gen/generate (s/gen :invoice-spec.models.document/document)))
+(defn random-new []
+  (-> (s/keys :req-un [::type
+                       ::date ::due-date
+                       :invoice-spec.models.client/client
+                       :invoice-spec.models.item/items])
+      (s/gen)
+      (gen/generate)
+      (assoc :status "draft")))
+
+(defn new-invoice []
+  (-> (random-new)
+      (dissoc :type)))
 
 (comment
+  (random-new)
   (gen/generate (s/gen ::document))
   (def transitions-gen (s/gen ::transitions))
 

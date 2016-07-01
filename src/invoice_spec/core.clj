@@ -6,7 +6,6 @@
             [invoice-spec.api :as api]))
 
 ;; https://github.com/weareswat/invoicexpress/pull/2498
-(prn 1)
 
 (api/document-xml-str (gen/generate (s/gen :invoice-spec.models.document/document)))
 
