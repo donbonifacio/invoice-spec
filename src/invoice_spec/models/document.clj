@@ -51,29 +51,20 @@
 (s/def ::transitions (s/with-gen (s/+ ::transition)
                                  #(gen/vector (s/gen ::transition) 1 5)))
 
-(defn random-new []
-  (-> (s/keys :req-un [::type
-                       ::date ::due_date
+(defn document-generator []
+  (-> (s/keys :req-un [::date ::due_date
                        :invoice-spec.models.client/client
                        :invoice-spec.models.item/items])
-      (s/gen)
+      (s/gen)))
+
+(defn random-new []
+  (-> (document-generator)
       (gen/generate)
       (assoc :status "draft")))
+
+(defn invoice-generator []
+  (document-generator))
 
 (defn new-invoice []
   (-> (random-new)
       (dissoc :type)))
-
-(comment
-  (random-new)
-  (gen/generate (s/gen ::document))
-  (def transitions-gen (s/gen ::transitions))
-
-  (gen/sample transitions-gen)
-
-  (gen/generate
-    (gen/bind (s/gen ::document) (fn [doc] (gen/tuple (gen/return doc)
-                                                     transitions-gen)))))
-
-
-

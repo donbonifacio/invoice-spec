@@ -108,3 +108,7 @@
 (defn cancel [document & cancel-message]
   (change-state document {:state "canceled"
                           :message (or cancel-message "Canceled")}))
+
+(defn settle [document]
+  (change-state document {:state "settled"}))
+

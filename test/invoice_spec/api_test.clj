@@ -33,6 +33,25 @@
               (is-valid-document? result)
               (is (= "canceled" (:status result))))))))))
 
+(deftest create-invoice-pay-test
+  (testing "creating an invoice"
+    (let [invoice (document/new-invoice)
+          result (<!! (api/create invoice))]
+      (is (result/succeeded? result))
+      (is-valid-document? result)
+
+      (testing "finalizing an invoice"
+        (let [result (<!! (api/finalize result))]
+          (is (result/succeeded? result))
+          (is-valid-document? result)
+          (is (= "final" (:status result)))
+
+          (testing "paying an invoice"
+            (let [result (<!! (api/settle result))]
+              (is (result/succeeded? result))
+              (is-valid-document? result)
+              (is (= "settled" (:status result))))))))))
+
 (deftest change-state-body-test
   (is (= "<invoice><state>finalized</state></invoice>"
          (api/change-state-body {} {:state "finalized"}))))
