@@ -12,6 +12,7 @@
                                    :invoice-spec.models.client/client
                                    :invoice-spec.models.item/items]
                           :opt-un [::saft_hash
+                                   ::cancel_reason
                                    ::currency
                                    ::before_taxes]))
 
@@ -39,6 +40,7 @@
 
 (s/def ::saft_hash (s/and string? #(= 4 (count %))))
 (s/def ::currency #{"Euro"})
+(s/def ::cancel_reason string?)
 
 (s/def ::transition #{
                       [:cancel]

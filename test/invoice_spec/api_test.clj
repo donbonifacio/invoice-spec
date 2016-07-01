@@ -14,7 +14,7 @@
   (is (s/valid? :invoice-spec.models.document/document document)
       (s/explain-str :invoice-spec.models.document/document document)))
 
-(deftest create-invoice-test
+(deftest create-invoice-cancel-test
   (testing "creating an invoice"
     (let [invoice (document/new-invoice)
           result (<!! (api/create invoice))]
@@ -23,6 +23,16 @@
 
       (testing "finalizing an invoice"
         (let [result (<!! (api/finalize result))]
-          (prn result)
           (is (result/succeeded? result))
-          (is-valid-document? result))))))
+          (is-valid-document? result)
+          (is (= "final" (:status result)))
+
+          (testing "canceling an invoice"
+            (let [result (<!! (api/cancel result))]
+              (is (result/succeeded? result))
+              (is-valid-document? result)
+              (is (= "canceled" (:status result))))))))))
+
+(deftest change-state-body-test
+  (is (= "<invoice><state>finalized</state></invoice>"
+         (api/change-state-body {} {:state "finalized"}))))

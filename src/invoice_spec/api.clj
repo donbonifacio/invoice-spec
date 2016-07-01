@@ -83,15 +83,28 @@
                                         :plain-body? true}))]
       (result/success (load-from-xml (:body response))))))
 
-(defn finalize [{:keys [id] :as document}]
+(defn change-state-body [document data]
+  (str "<invoice>"
+         (reduce-kv (fn [all k v]
+                   (str all "<"(name k)">"v"</"(name k)">"))
+                 ""
+                 data)
+        "</invoice>"))
+
+(defn change-state [{:keys [id] :as document} data]
   {:pre [(some? id)]}
   (go
     (result/enforce-let [response (<! (request-utils/http-put
                                          {:host (url (str "/invoice/" id "/change-state.xml"))
                                           :headers {"Content-type" "application/xml; charset=utf-8"}
                                           :plain-body? true
-                                          :body (str "<invoice>"
-                                                      "<state>finalized</state>"
-                                                     "</invoice>")}))
+                                          :body (change-state-body document data)}))
                          document (<! (reload-document document))]
         document)))
+
+(defn finalize [document]
+  (change-state document {:state "finalized"}))
+
+(defn cancel [document & cancel-message]
+  (change-state document {:state "canceled"
+                          :message (or cancel-message "Canceled")}))
