@@ -34,7 +34,7 @@
   (str (env :ix-api-host) path "?api_key=" (env :ix-api-key)))
 
 (def boolean-fields #{:archived})
-(def number-fields #{:taxes :total :id :before_taxes :discount :sum
+(def number-fields #{:taxes :total :id :before_taxes :discount :sum :value
                      :unit_price :quantity :tax_amount :subtotal :discount_amount})
 
 (defn add-field [m xml-elem]
@@ -50,6 +50,8 @@
             (cond
               (= :client (:tag xml-elem))
                 (assoc m :client (xml->map (:content xml-elem) {}))
+              (= :tax (:tag xml-elem))
+                (assoc m :tax (xml->map (:content xml-elem) {}))
               (= :items (:tag xml-elem))
                 (assoc m :items (map #(xml->map (:content %) {}) (:content xml-elem)))
               (= :invoice_timeline (:tag xml-elem))

@@ -39,7 +39,7 @@
 
 (defn random-new []
   (-> (s/keys :req-un [::type
-                       ::date ::due-date
+                       ::date ::due_date
                        :invoice-spec.models.client/client
                        :invoice-spec.models.item/items])
       (s/gen)
