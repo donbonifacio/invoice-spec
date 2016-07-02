@@ -16,7 +16,7 @@
                                    ::currency
                                    ::before_taxes]))
 
-(s/def ::type #{"Invoice" "CreditNode" "DebitNote" "Receipt"})
+(s/def ::type #{"Invoice" "InvoiceReceipt" "CreditNode" "DebitNote" "Receipt"})
 (s/def ::status #{"draft" "final" "settled" "canceled"})
 
 (defn sequence-number? [raw]
@@ -53,6 +53,7 @@
 
 (defn document-generator []
   (-> (s/keys :req-un [::date ::due_date
+                       ::type
                        :invoice-spec.models.client/client
                        :invoice-spec.models.item/items])
       (s/gen)))
