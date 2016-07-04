@@ -59,9 +59,11 @@
          (api/change-state-body {} {:state "finalized"}))))
 
 (defspec all-documents-finalize
-  1
-  (prop/for-all [document (document/document-generator)]
-                (let [created (<!! (api/create document))
+  3
+  (prop/for-all [document-type (document/type-generator)
+                 document (document/document-generator)]
+                (let [document (assoc document :type document-type)
+                      created (<!! (api/create document))
                       final (<!! (api/finalize created))]
-                  (= "final"
+                  (= (document/expected-final-status document)
                      (:status final)))))

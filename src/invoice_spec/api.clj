@@ -7,8 +7,14 @@
             [environ.core :refer [env]]
             [clojure.data.xml :as xml]))
 
+(defn doc-path [document]
+  (cond
+    (= "InvoiceReceipt" (:type document)) "invoice_receipt"
+    (= "SimplifiedInvoice" (:type document)) "simplified_invoice"
+    :else "invoice"))
+
 (defn document-xml [document]
-  (xml/element :invoice {}
+  (xml/element (keyword (doc-path document)) {}
                (xml/element :date {} (:date document))
                (if-let [sequence-number (:sequence_number document)]
                  (xml/element :sequence_number {} sequence-number))
@@ -68,7 +74,7 @@
 (defn create [document]
   (go
     (result/on-success [response (<! (request-utils/http-post
-                                       {:host (url "/invoices.xml")
+                                       {:host (url (str "/" (doc-path document) "s.xml"))
                                         :headers {"Content-type" "application/xml; charset=utf-8"}
                                         :plain-body? true
                                         :body (document-xml-str document)}))]
@@ -78,24 +84,25 @@
   {:pre [(some? id)]}
   (go
     (result/on-success [response (<! (request-utils/http-get
-                                       {:host (url (str "/invoices/" id ".xml"))
+                                       {:host (url (str "/" (doc-path document) "s/" id ".xml"))
                                         :headers {"Content-type" "application/xml; charset=utf-8"}
                                         :plain-body? true}))]
       (result/success (load-from-xml (:body response))))))
 
 (defn change-state-body [document data]
-  (str "<invoice>"
-         (reduce-kv (fn [all k v]
-                   (str all "<"(name k)">"v"</"(name k)">"))
-                 ""
-                 data)
-        "</invoice>"))
+  (let [path (doc-path document)]
+    (str "<"path">"
+           (reduce-kv (fn [all k v]
+                     (str all "<"(name k)">"v"</"(name k)">"))
+                   ""
+                   data)
+          "</"path">")))
 
 (defn change-state [{:keys [id] :as document} data]
   {:pre [(some? id)]}
   (go
     (result/enforce-let [response (<! (request-utils/http-put
-                                         {:host (url (str "/invoice/" id "/change-state.xml"))
+                                         {:host (url (str "/"(doc-path document)"s/" id "/change-state.xml"))
                                           :headers {"Content-type" "application/xml; charset=utf-8"}
                                           :plain-body? true
                                           :body (change-state-body document data)}))

@@ -17,6 +17,7 @@
                                    ::before_taxes]))
 
 (s/def ::type #{"Invoice" "InvoiceReceipt" "CreditNode" "DebitNote" "Receipt"})
+(s/def ::primary-type #{"Invoice" "InvoiceReceipt" "SimplifiedInvoice"})
 (s/def ::status #{"draft" "final" "settled" "canceled"})
 
 (defn sequence-number? [raw]
@@ -58,6 +59,9 @@
                        :invoice-spec.models.item/items])
       (s/gen)))
 
+(defn type-generator []
+  (s/gen ::primary-type))
+
 (defn random-new []
   (-> (document-generator)
       (gen/generate)
@@ -68,4 +72,9 @@
 
 (defn new-invoice []
   (-> (random-new)
-      (dissoc :type)))
+      (assoc :type "Invoice")))
+
+(defn expected-final-status [document]
+  (if (= "InvoiceReceipt" (:type document))
+    "settled"
+    "final"))
