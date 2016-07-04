@@ -1,4 +1,4 @@
-(ns invoice-spec.api
+(ns invoice-spec.api.documents
   (:require [clojure.spec :as s]
             [clojure.spec.gen :as gen]
             [request-utils.core :as request-utils]

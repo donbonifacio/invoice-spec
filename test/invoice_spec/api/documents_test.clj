@@ -1,9 +1,9 @@
-(ns invoice-spec.api-test
+(ns invoice-spec.api.documents-test
   (:require [clojure.spec :as s]
             [clojure.spec.gen :as gen]
             [clojure.test :refer :all]
             [request-utils.core :as request-utils]
-            [invoice-spec.api :as api]
+            [invoice-spec.api.documents :as api]
             [invoice-spec.models.document :as document]
             [clojure.test.check.clojure-test :refer [defspec]]
             [clojure.test.check.properties :as prop]

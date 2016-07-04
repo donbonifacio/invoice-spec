@@ -3,7 +3,6 @@
             [clojure.spec.gen :as gen]
             [clojure.test :refer :all]
             [request-utils.core :as request-utils]
-            [invoice-spec.api :as api]
             [invoice-spec.models.document :as document]
             [clojure.core.async :refer [chan <!! >!! close! go <! timeout]]
             [environ.core :refer [env]]
