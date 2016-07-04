@@ -59,7 +59,7 @@
          (api/change-state-body {} {:state "finalized"}))))
 
 (defspec all-documents-finalize
-  3
+  1
   (prop/for-all [document-type (document/type-generator)
                  document (document/document-generator)]
                 (let [document (assoc document :type document-type)
