@@ -5,6 +5,7 @@
             [request-utils.core :as request-utils]
             [invoice-spec.api.documents :as api]
             [invoice-spec.models.document :as document]
+            [invoice-spec.models.sequence :as sequences]
             [clojure.test.check.clojure-test :refer [defspec]]
             [clojure.test.check.properties :as prop]
             [clojure.core.async :refer [chan <!! >!! close! go <! timeout]]
@@ -61,9 +62,13 @@
 (defspec all-documents-finalize
   1
   (prop/for-all [document-type (document/type-generator)
+                 serie (sequences/serie-generator)
                  document (document/document-generator)]
-                (let [document (assoc document :type document-type)
+                (let [document (assoc document :type document-type
+                                               :sequence_id (:id serie))
                       created (<!! (api/create document))
                       final (<!! (api/finalize created))]
+                  (assert (= (:id serie) (:sequence_id final)))
+                  (assert (:id serie))
                   (= (document/expected-final-status document)
                      (:status final)))))

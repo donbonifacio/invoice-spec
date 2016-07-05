@@ -13,8 +13,6 @@
             [clojure.data.xml :as xml]))
 
 (deftest create-sequence-test
-
-  #_(let [serie (gen/generate (sequences/serie-generator))
-        ixseq (api/create {:serie serie})]
-    (is (result/succeeded? serie))
-    ))
+  (let [serie (gen/generate (sequences/serie-generator))
+        ixseq (<!! (api/create {:serie serie}))]
+    (is (result/succeeded? ixseq))))

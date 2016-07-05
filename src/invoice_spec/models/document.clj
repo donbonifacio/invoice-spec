@@ -12,10 +12,14 @@
                                    :invoice-spec.models.client/client
                                    :invoice-spec.models.item/items]
                           :opt-un [::saft_hash
+                                   ::sequence_id
+                                   ::id
                                    ::cancel_reason
                                    ::currency
                                    ::before_taxes]))
 
+(s/def ::id integer?)
+(s/def ::sequence_id integer?)
 (s/def ::type #{"Invoice" "InvoiceReceipt" "CreditNode" "DebitNote" "Receipt"})
 (s/def ::primary-type #{"Invoice" "InvoiceReceipt" "SimplifiedInvoice"})
 (s/def ::status #{"draft" "final" "settled" "canceled"})
@@ -54,7 +58,6 @@
 
 (defn document-generator []
   (-> (s/keys :req-un [::date ::due_date
-                       ::type
                        :invoice-spec.models.client/client
                        :invoice-spec.models.item/items])
       (s/gen)))
