@@ -4,6 +4,8 @@
             [request-utils.core :as request-utils]
             [clojure.core.async :refer [chan <!! >!! close! go <! timeout]]
             [invoice-spec.api.common :as common]
+            [invoice-spec.models.sequence :as sequences]
+            [invoice-spec.api.sequences :as seq-api]
             [result.core :as result]
             [environ.core :refer [env]]
             [clojure.data.xml :as xml]))
@@ -17,11 +19,17 @@
     (= "SimplifiedInvoice" (:type document)) "simplified_invoice"
     :else "invoice"))
 
+(defn sequence-key [document]
+  (let [path (doc-path document)]
+    (keyword (str "current_" path "_sequence_id"))))
+
 (defn document-xml [document]
   (xml/element (keyword (doc-path document)) {}
                (xml/element :date {} (:date document))
                (if-let [sequence-number (:sequence_number document)]
                  (xml/element :sequence_number {} sequence-number))
+               (if-let [sequence-id (:sequence_id document)]
+                 (xml/element :sequence_id {} sequence-id))
                (xml/element :status {} (:status document))
                (xml/element :client {}
                             (xml/element :name {} (get-in document [:client :name]))
@@ -88,3 +96,9 @@
 (defn settle [document]
   (change-state document {:state "settled"}))
 
+(defn set-random-sequence [document]
+  (let[serie (gen/generate (sequences/serie-generator))
+        ixseq (<!! (seq-api/create {:serie serie}))
+        seq-id (get ixseq (sequence-key document))
+        document (assoc document :sequence_id seq-id)]
+    document))
