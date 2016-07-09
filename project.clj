@@ -6,7 +6,7 @@
 
   :aliases {"autotest" ["trampoline" "with-profile" "+test,+test-deps" "test-refresh"]}
 
-  :dependencies [[org.clojure/clojure "1.9.0-alpha7"]
+  :dependencies [[org.clojure/clojure "1.9.0-alpha9"]
                  [org.clojure/data.xml "0.0.8"]
                  [org.clojure/test.check "0.9.0"]
                  [aleph "0.4.1"]
