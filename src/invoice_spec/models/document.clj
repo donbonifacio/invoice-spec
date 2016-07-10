@@ -2,6 +2,7 @@
   (:require [clojure.spec :as s]
             [invoice-spec.models.client]
             [invoice-spec.models.item]
+            [result.core :as result]
             [clojure.spec.gen :as gen]))
 
 (s/def ::document (s/keys :req-un [::sequence_number
@@ -81,3 +82,8 @@
   (if (= "InvoiceReceipt" (:type document))
     "settled"
     "final"))
+
+(defn validate [document]
+  (if (s/valid? ::document document)
+    (result/success document)
+    (result/failure (s/explain-str ::document document))))

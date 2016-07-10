@@ -2,6 +2,7 @@
   (:require [clojure.spec :as s]
             [clojure.spec.gen :as gen]
             [clojure.test :refer :all]
+            [result.core :as result]
             [invoice-spec.api.documents :as api]
             [invoice-spec.api.sequences :as seq-api]
             [invoice-spec.models.document :as document]
@@ -10,5 +11,8 @@
             [invoice-spec.transitions.processor :as processor]))
 
 (deftest create-test
-  (let [result (processor/run {:transitions [[:create {:offset-days 0}]]})]
-    (is result)))
+  (let [document (-> (gen/generate (document/document-generator))
+                     (api/set-random-sequence))
+        result (processor/run {:document document
+                               :transitions [[:create {:offset-days 10}]]})]
+    (is (result/succeeded? result))))

@@ -30,4 +30,6 @@
   (s/gen ::complete-transitions))
 
 #_(prn (gen/sample (s/gen ::transition)))
-(prn (gen/generate (generator)))
+#_(prn (gen/generate (generator)))
+
+
