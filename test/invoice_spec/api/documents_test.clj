@@ -20,7 +20,8 @@
 
 (deftest create-invoice-cancel-test
   (testing "creating an invoice"
-    (let [invoice (document/new-invoice)
+    (let [invoice (-> (document/new-invoice)
+                      (api/set-random-sequence))
           result (<!! (api/create invoice))]
       (is (result/succeeded? result))
       (is-valid-document? result)
@@ -39,7 +40,8 @@
 
 (deftest create-invoice-pay-test
   (testing "creating an invoice"
-    (let [invoice (document/new-invoice)
+    (let [invoice (-> (document/new-invoice)
+                      (api/set-random-sequence))
           result (<!! (api/create invoice))]
       (is (result/succeeded? result))
       (is-valid-document? result)
@@ -73,7 +75,8 @@
                      (:status final)))))
 
 (deftest related-documents-test
-    (let [invoice (document/new-invoice)
+    (let [invoice (-> (document/new-invoice)
+                      (api/set-random-sequence))
           result (<!! (api/create invoice))]
       (is (result/succeeded? result))
 

@@ -7,6 +7,7 @@
             [invoice-spec.transitions.delete]
             [invoice-spec.transitions.cancel]
             [invoice-spec.transitions.settle]
+            [invoice-spec.transitions.cancel-last-receipt]
             [invoice-spec.transitions.finalize]))
 
 (defn- operate [context transition]

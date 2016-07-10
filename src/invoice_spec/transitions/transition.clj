@@ -22,7 +22,8 @@
   #{[:finalize]
     [:delete]
     [:settle]
-    [:cancel]})
+    [:cancel]
+    [:cancel-last-receipt]})
 
 (s/def ::transition-examples transition-examples)
 
@@ -50,7 +51,7 @@
 
 (defn valid-operation-status? [result]
   #_(< 199 (:status result) 500)
-  true)
+  (not= 404 (:status result)))
 
 (defn untouched [document]
   (let [previous document
