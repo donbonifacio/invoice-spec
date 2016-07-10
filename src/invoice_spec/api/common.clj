@@ -41,3 +41,9 @@
 (defn load-from-xml [raw-xml-str]
   (let [xml-data (xml/parse-str raw-xml-str)]
     (xml->map (:content xml-data) {:type (:tag xml-data)})))
+
+(defn load-coll-from-xml [raw-xml-str]
+  (let [xml-data (xml/parse-str raw-xml-str)]
+    (map (fn [xml-data]
+           (xml->map (:content xml-data) {:type (:tag xml-data)}))
+         (:content xml-data))))

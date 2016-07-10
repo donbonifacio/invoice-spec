@@ -61,7 +61,7 @@
          (api/change-state-body {} {:state "finalized"}))))
 
 (defspec all-documents-finalize
-  1
+  0
   (prop/for-all [document-type (document/type-generator)
                  document (document/document-generator)]
                 (let [document (-> (assoc document :type document-type)
@@ -71,3 +71,22 @@
                   #_(prn (:id final) (:type final) (:sequence_number final))
                   (= (document/expected-final-status document)
                      (:status final)))))
+
+(deftest related-documents-test
+    (let [invoice (document/new-invoice)
+          result (<!! (api/create invoice))]
+      (is (result/succeeded? result))
+
+      (let [result (<!! (api/finalize result))]
+        (is (result/succeeded? result))
+
+        (let [result (<!! (api/settle result))]
+          (is (result/succeeded? result))
+          (is (= "settled" (:status result)))
+
+          (testing "related documents"
+            (let [result (<!! (api/related-documents result))]
+              (is (result/succeeded? result))
+              (is (= 1 (count (:documents result))))
+              (is (= "Receipt" (-> result :documents first :type)))
+              (is (= "final" (-> result :documents first :status)))))))))

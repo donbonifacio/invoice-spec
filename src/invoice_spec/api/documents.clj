@@ -12,6 +12,7 @@
 
 (def url common/url)
 (def load-from-xml common/load-from-xml)
+(def load-coll-from-xml common/load-coll-from-xml)
 
 (defn doc-path [document]
   (cond
@@ -65,6 +66,15 @@
                                         :headers {"Content-type" "application/xml; charset=utf-8"}
                                         :plain-body? true}))]
       (result/success (load-from-xml (:body response))))))
+
+(defn related-documents [{:keys [id] :as document}]
+  {:pre [(some? id)]}
+  (go
+    (result/on-success [response (<! (request-utils/http-get
+                                       {:host (url (str "/document/" id "/related_documents.xml"))
+                                        :headers {"Content-type" "application/xml; charset=utf-8"}
+                                        :plain-body? true}))]
+      (result/success {:documents (load-coll-from-xml (:body response))}))))
 
 (defn change-state-body [document data]
   (let [path (doc-path document)]
