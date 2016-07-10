@@ -1,4 +1,4 @@
-(ns invoice-spec.transitions.finalize
+(ns invoice-spec.transitions.cancel
   (:require [clojure.spec :as s]
             [clojure.spec.gen :as gen]
             [result.core :as result]
@@ -9,23 +9,20 @@
             [invoice-spec.transitions.transition :as transition]))
 
 (defn- validate [document]
-  (let [status (document/expected-final-status document)]
-    (cond
-      (not= status (:status document))
-        (result/failure {:error "status-mismatch"
-                         :expected status
-                         :got (:status document)})
+  (cond
+    (not= "canceled" (:status document))
+      (result/failure "status-mismatch")
 
-      :else (result/success))))
+    :else (result/success)))
 
 (defn process-success [final]
   (result/enforce-let [valid? (document/validate final)
                        valid-logic? (validate final)]
     (result/success {:document final})))
 
-(defmethod transition/operate :finalize [context transition]
+(defmethod transition/operate :cancel [context transition]
   (result/on-success [document (result/presence (:document context))]
-    (let [final (<!! (api/finalize document))]
-      (if (result/succeeded? final)
-        (process-success final)
-        (transition/process-failure final document)))))
+    (let [canceled (<!! (api/cancel document))]
+      (if (result/succeeded? canceled)
+        (process-success canceled)
+        (transition/process-failure canceled document)))))

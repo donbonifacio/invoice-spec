@@ -21,7 +21,7 @@
 
 (s/def ::id integer?)
 (s/def ::sequence_id integer?)
-(s/def ::type #{"Invoice" "InvoiceReceipt" "CreditNode" "DebitNote" "Receipt"})
+(s/def ::type #{"Invoice" "SimplifiedInvoice" "InvoiceReceipt" "CreditNode" "DebitNote" "Receipt"})
 (s/def ::primary-type #{"Invoice" "InvoiceReceipt" "SimplifiedInvoice"})
 (s/def ::status #{"draft" "deleted" "final" "settled" "canceled"})
 

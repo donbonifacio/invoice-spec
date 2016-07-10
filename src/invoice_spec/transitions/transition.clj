@@ -20,7 +20,8 @@
 
 (def transition-examples
   #{[:finalize]
-    [:delete]})
+    [:delete]
+    [:cancel]})
 
 (s/def ::transition-examples transition-examples)
 
