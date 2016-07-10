@@ -32,4 +32,6 @@
 #_(prn (gen/sample (s/gen ::transition)))
 #_(prn (gen/generate (generator)))
 
-
+(defn valid-operation-status? [result]
+  (< 199 (:status result) 500)
+  )

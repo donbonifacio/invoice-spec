@@ -18,6 +18,9 @@
     (not= "draft" (:status document))
       (result/failure "status-mismatch")
 
+    (not (integer? (:id document)))
+      (result/failure "no-id")
+
     (not= (dates/offset (offset-days transition)) (:date document))
       (result/failure "date-mismatch")
 
