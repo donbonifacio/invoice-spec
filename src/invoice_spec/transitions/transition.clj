@@ -16,11 +16,12 @@
     [:create {:offset-days 10}]
     [:create {:offset-days 20}]})
 
-(s/def ::create-examples create-examples)
+(s/def ::create-transitions create-examples)
 
 (def transition-examples
   #{[:finalize]
     [:delete]
+    [:settle]
     [:cancel]})
 
 (s/def ::transition-examples transition-examples)
@@ -28,8 +29,18 @@
 (s/def ::transition (fn [data]
                       (some transition-keys [(first data)])))
 
-(s/def ::complete-transitions (s/cat :create-part ::create-examples
+(s/def ::complete-transitions (s/cat :create-part ::create-transitions
                                      :other-part (s/+ ::transition-examples)))
+
+(defn create-generator []
+  (s/gen ::create-transitions))
+
+(defn other-generator []
+  (s/gen (s/every ::transition-examples :min-count 1
+                                        :max-count 10
+                                        :into [])))
+
+#_(prn (gen/sample (other-generator)))
 
 (defn generator []
   (s/gen ::complete-transitions))

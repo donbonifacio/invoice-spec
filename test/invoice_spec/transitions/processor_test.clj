@@ -43,16 +43,18 @@
     (is (= "canceled" (get-in result [:document :status])))))
 
 (defspec document-transitions
-  1000
+  1
   (prop/for-all [document-type (document/type-generator)
-                 transitions (transition/generator)]
-                (let [document (-> (gen/generate (document/document-generator))
+                 create-transition (transition/create-generator)
+                 transitions (transition/other-generator)]
+                (let [transitions (concat [create-transition] transitions)
+                      document (-> (gen/generate (document/document-generator))
                                    (assoc :type document-type)
                                    (api/set-random-sequence))
                       result (processor/run {:document document
                                              :transitions transitions})]
 
-                  (prn document-type transitions)
+                  (prn document-type transitions (get-in result [:document :status]))
                   (when (result/failed? result)
                     (prn "---")
                     (prn result))

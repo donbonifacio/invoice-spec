@@ -8,21 +8,26 @@
             [clojure.core.async :refer [chan <!! >!! close! go <! timeout]]
             [invoice-spec.transitions.transition :as transition]))
 
-(defn- validate [document]
+(defn- validate [document previous]
   (cond
     (not= "deleted" (:status document))
       (result/failure "status-mismatch")
 
+    (not= "draft" (:status previous))
+      (result/failure {:error "deleted a non draft document"
+                       :previous-status (:status previous)
+                       :status (:status document)})
+
     :else (result/success)))
 
-(defn process-success [final]
+(defn process-success [final previous]
   (result/enforce-let [valid? (document/validate final)
-                       valid-logic? (validate final)]
+                       valid-logic? (validate final previous)]
     (result/success {:document final})))
 
 (defmethod transition/operate :delete [context transition]
   (result/on-success [document (result/presence (:document context))]
     (let [deleted (<!! (api/delete document))]
       (if (result/succeeded? deleted)
-        (process-success deleted)
+        (process-success deleted document)
         (transition/process-failure deleted document)))))
