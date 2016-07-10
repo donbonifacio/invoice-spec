@@ -1,5 +1,8 @@
 (ns invoice-spec.transitions.transition
   (:require [clojure.spec :as s]
+            [invoice-spec.api.documents :as api]
+            [result.core :as result]
+            [clojure.core.async :refer [chan <!! >!! close! go <! timeout]]
             [clojure.spec.gen :as gen]))
 
 (defmulti operate #(first %2))
@@ -16,7 +19,8 @@
 (s/def ::create-examples create-examples)
 
 (def transition-examples
-  #{[:finalize]})
+  #{[:finalize]
+    [:delete]})
 
 (s/def ::transition-examples transition-examples)
 
@@ -33,5 +37,21 @@
 #_(prn (gen/generate (generator)))
 
 (defn valid-operation-status? [result]
-  (< 199 (:status result) 500)
-  )
+  #_(< 199 (:status result) 500)
+  true)
+
+(defn untouched [document]
+  (let [previous document
+        current (<!! (api/reload-document previous))]
+    (if (= previous current)
+      (result/success)
+      (result/failure {:error "document-mismatch"
+                       :previous previous
+                       :current current}))))
+
+(defn process-failure [result document]
+  (if (valid-operation-status? result)
+    (result/on-success [document-untouched? (untouched document)]
+      (result/success {:document document}))
+    result))
+

@@ -1,4 +1,4 @@
-(ns invoice-spec.transitions.finalize
+(ns invoice-spec.transitions.delete
   (:require [clojure.spec :as s]
             [clojure.spec.gen :as gen]
             [result.core :as result]
@@ -10,7 +10,7 @@
 
 (defn- validate [document]
   (cond
-    (not= "final" (:status document))
+    (not= "deleted" (:status document))
       (result/failure "status-mismatch")
 
     :else (result/success)))
@@ -20,9 +20,9 @@
                        valid-logic? (validate final)]
     (result/success {:document final})))
 
-(defmethod transition/operate :finalize [context transition]
+(defmethod transition/operate :delete [context transition]
   (result/on-success [document (result/presence (:document context))]
-    (let [final (<!! (api/finalize document))]
-      (if (result/succeeded? final)
-        (process-success final)
-        (transition/process-failure final document)))))
+    (let [deleted (<!! (api/delete document))]
+      (if (result/succeeded? deleted)
+        (process-success deleted)
+        (transition/process-failure deleted document)))))

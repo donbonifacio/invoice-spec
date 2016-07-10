@@ -26,12 +26,14 @@
     (is (result/succeeded? result))
     (is (= "final" (get-in result [:document :status])))))
 
-(deftest invalid-finalize-test
+(deftest with-invalid-test
   (let [document (-> (gen/generate (document/document-generator))
                      (api/set-random-sequence))
         result (processor/run {:document document
                                :transitions [[:create {:offset-days 0}]
                                              [:finalize]
+                                             [:delete]
                                              [:finalize]]})]
+
     (is (result/succeeded? result))
     (is (= "final" (get-in result [:document :status])))))

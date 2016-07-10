@@ -96,6 +96,9 @@
 (defn settle [document]
   (change-state document {:state "settled"}))
 
+(defn delete [document]
+  (change-state document {:state "deleted"}))
+
 (defn set-random-sequence [document]
   (let[serie (gen/generate (sequences/serie-generator))
         ixseq (<!! (seq-api/create {:serie serie}))

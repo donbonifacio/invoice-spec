@@ -23,7 +23,7 @@
 (s/def ::sequence_id integer?)
 (s/def ::type #{"Invoice" "InvoiceReceipt" "CreditNode" "DebitNote" "Receipt"})
 (s/def ::primary-type #{"Invoice" "InvoiceReceipt" "SimplifiedInvoice"})
-(s/def ::status #{"draft" "final" "settled" "canceled"})
+(s/def ::status #{"draft" "deleted" "final" "settled" "canceled"})
 
 (defn sequence-number? [raw]
   (re-matches #"^\d+\/\w+" raw))
