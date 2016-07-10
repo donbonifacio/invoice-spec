@@ -43,7 +43,7 @@
     (is (= "canceled" (get-in result [:document :status])))))
 
 (defspec document-transitions
-  1
+  10
   (prop/for-all [document-type (document/type-generator)
                  create-transition (transition/create-generator)
                  transitions (transition/other-generator)]
@@ -58,5 +58,4 @@
                   (when (result/failed? result)
                     (prn "---")
                     (prn result))
-                  (result/succeeded? result)
-                )))
+                  (result/succeeded? result))))

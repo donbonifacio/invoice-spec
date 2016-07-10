@@ -18,9 +18,28 @@
 
       :else (result/success))))
 
+(defn validate-receipt [document]
+  (result/on-success [result (<!! (api/related-documents document))]
+    (let [receipt (last (filter #(= "Receipt" (:type %)) (:documents result)))
+          status (document/expected-final-status receipt)]
+      (cond
+        (nil? receipt)
+          (result/failure {:error "no receipt found"
+                           :type (:type document)
+                           :status (:status document)})
+
+        (not= status (:status receipt))
+          (result/failure {:error "invalid receipt satus"
+                           :expected status
+                           :receipt-type (:type receipt)
+                           :got (:status receipt)})
+        :else
+          (result/success)))))
+
 (defn process-success [final]
   (result/enforce-let [valid? (document/validate final)
-                       valid-logic? (validate final)]
+                       valid-logic? (validate final)
+                       receipt-present? (validate-receipt final)]
     (result/success {:document final})))
 
 (defmethod transition/operate :settle [context transition]
