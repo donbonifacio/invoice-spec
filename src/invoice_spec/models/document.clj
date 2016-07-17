@@ -19,8 +19,13 @@
                                    ::currency
                                    ::before_taxes]))
 
-(s/def ::id integer?)
-(s/def ::sequence_id integer?)
+(s/def ::basic-document
+  (s/keys :req-un [::date ::due_date
+                   :invoice-spec.models.client/client
+                   :invoice-spec.models.item/items]))
+
+(s/def ::id nat-int?)
+(s/def ::sequence_id nat-int?)
 (s/def ::type #{"Invoice" "SimplifiedInvoice" "InvoiceReceipt" "CreditNode" "DebitNote" "Receipt"})
 (s/def ::primary-type #{"Invoice" "InvoiceReceipt" "SimplifiedInvoice"})
 (s/def ::status #{"draft" "deleted" "final" "settled" "canceled"})
@@ -35,11 +40,13 @@
 (s/def ::date (s/with-gen string? #(s/gen #{"01/01/2016"})))
 (s/def ::due_date (s/with-gen string? #(s/gen #{"01/01/2016"})))
 
-(s/def ::discount number?)
-(s/def ::sum number?)
-(s/def ::taxes number?)
-(s/def ::total number?)
-(s/def ::before_taxes number?)
+(def nat-number? (s/and number? (comp not neg?)))
+
+(s/def ::discount nat-number?)
+(s/def ::sum nat-number?)
+(s/def ::taxes nat-number?)
+(s/def ::total nat-number?)
+(s/def ::before_taxes nat-number?)
 (s/def ::archived boolean?)
 (s/def ::permalink string?)
 (s/def ::reference (s/nilable string?))
@@ -58,10 +65,7 @@
                                  #(gen/vector (s/gen ::transition) 1 5)))
 
 (defn document-generator []
-  (-> (s/keys :req-un [::date ::due_date
-                       :invoice-spec.models.client/client
-                       :invoice-spec.models.item/items])
-      (s/gen)))
+  (s/gen ::basic-document))
 
 (defn type-generator []
   (s/gen ::primary-type))
@@ -78,10 +82,17 @@
   (-> (random-new)
       (assoc :type "Invoice")))
 
+(s/fdef new-invoice
+  :ret ::document)
+
 (defn expected-final-status [document]
   (if (= "InvoiceReceipt" (:type document))
     "settled"
     "final"))
+
+(s/fdef expected-final-status
+  :args (s/cat :document ::document)
+  :ret ::status)
 
 (defn validate [document]
   (if (s/valid? ::document document)

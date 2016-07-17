@@ -13,7 +13,7 @@
                                ::discount ::discount_amount
                                ::total ::subtotal]))
 
-(def pos-or-zero? (comp not neg?))
+(def nat-number? (s/and number? (comp not neg?)))
 
 (s/def ::name (s/with-gen string? #(s/gen (->> (range 10) (map (fn [n] (str "Item " n))) (set)))))
 (s/def ::description (s/nilable string?))
@@ -21,11 +21,11 @@
                               #(s/gen (s/int-in 1 100))))
 (s/def ::unit_price (s/with-gen (s/and number? #(<= 1 % 100))
                                 #(s/gen (s/int-in 1 100))))
-(s/def ::discount (s/with-gen (s/and number? pos-or-zero?)
+(s/def ::discount (s/with-gen nat-number?
                               #(s/gen (s/int-in 0 100))))
-(s/def ::discount_amount (s/with-gen (s/and number? pos-or-zero?)
+(s/def ::discount_amount (s/with-gen nat-number?
                                      #(s/gen (s/int-in 0 100))))
-(s/def ::total (s/with-gen (s/and number? pos?)
+(s/def ::total (s/with-gen nat-number?
                            #(s/gen (s/int-in 0 100))))
-(s/def ::subtotal (s/with-gen (s/and number? pos?)
+(s/def ::subtotal (s/with-gen nat-number?
                               #(s/gen (s/int-in 0 100))))

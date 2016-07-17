@@ -33,15 +33,25 @@
 (s/def ::complete-transitions (s/cat :create-part ::create-transitions
                                      :other-part (s/+ ::transition-examples)))
 
+(s/def ::other-transitions (s/every ::transition-examples :min-count 1
+                                                          :max-count 10
+                                                          :into []))
+
 (defn create-generator []
   (s/gen ::create-transitions))
 
 (defn other-generator []
-  (s/gen (s/every ::transition-examples :min-count 1
-                                        :max-count 10
-                                        :into [])))
+  (s/gen ::other-transitions))
 
-#_(prn (gen/sample (other-generator)))
+(s/def ::document-and-transitions
+  (s/+ (s/keys :req-un [::create-transitions
+                        ::other-transitions
+                        :invoice-spec.models.document/basic-document])))
+
+(defn document-and-transitions-generator []
+  (s/gen ::document-and-transitions))
+
+(prn (gen/generate (document-and-transitions-generator)))
 
 (defn generator []
   (s/gen ::complete-transitions))
