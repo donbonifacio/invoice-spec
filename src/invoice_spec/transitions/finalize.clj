@@ -25,7 +25,7 @@
 
 (defmethod transition/operate :finalize [context transition]
   (result/on-success [document (result/presence (:document context))]
-    (let [final (<!! (api/finalize document))]
+    (let [final (<!! (api/finalize context document))]
       (if (result/succeeded? final)
         (process-success final)
         (transition/process-failure final document)))))

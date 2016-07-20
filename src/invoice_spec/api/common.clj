@@ -7,8 +7,21 @@
             [environ.core :refer [env]]
             [clojure.data.xml :as xml]))
 
-(defn url [path]
-  (str (env :ix-api-host) path "?api_key=" (env :ix-api-key)))
+(defn env-port []
+  (or (env :ix-api-port) "3001"))
+
+(defn url [{:keys [host port path api-key]}]
+  (let [host (or host (env :ix-api-host))
+        port (or port (env-port))
+        api-key (or api-key (env :ix-api-key))]
+    (assert host)
+    (assert port)
+    (assert path)
+    (assert api-key)
+    (str host ":" port path "?api_key=" api-key)))
+
+(defn from-path [options path]
+  (url (merge options {:path path})))
 
 (def boolean-fields #{:archived})
 (def number-fields #{:taxes :total :id :before_taxes :discount :sum :value

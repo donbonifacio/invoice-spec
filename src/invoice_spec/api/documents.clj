@@ -10,7 +10,6 @@
             [environ.core :refer [env]]
             [clojure.data.xml :as xml]))
 
-(def url common/url)
 (def load-from-xml common/load-from-xml)
 (def load-coll-from-xml common/load-coll-from-xml)
 
@@ -50,29 +49,29 @@
 (defn document-xml-str [document]
   (xml/emit-str (document-xml document)))
 
-(defn create [document]
+(defn create [options document]
   (go
     (result/on-success [response (<! (request-utils/http-post
-                                       {:host (url (str "/" (doc-path document) "s.xml"))
+                                       {:host (common/from-path options (str "/" (doc-path document) "s.xml"))
                                         :headers {"Content-type" "application/xml; charset=utf-8"}
                                         :plain-body? true
                                         :body (document-xml-str document)}))]
       (result/success (load-from-xml (:body response))))))
 
-(defn reload-document [{:keys [id] :as document}]
+(defn reload-document [options {:keys [id] :as document}]
   {:pre [(some? id)]}
   (go
     (result/on-success [response (<! (request-utils/http-get
-                                       {:host (url (str "/" (doc-path document) "s/" id ".xml"))
+                                       {:host (common/from-path options (str "/" (doc-path document) "s/" id ".xml"))
                                         :headers {"Content-type" "application/xml; charset=utf-8"}
                                         :plain-body? true}))]
       (result/success (load-from-xml (:body response))))))
 
-(defn related-documents [{:keys [id] :as document}]
+(defn related-documents [options {:keys [id] :as document}]
   {:pre [(some? id)]}
   (go
     (result/on-success [response (<! (request-utils/http-get
-                                       {:host (url (str "/document/" id "/related_documents.xml"))
+                                       {:host (common/from-path options (str "/document/" id "/related_documents.xml"))
                                         :headers {"Content-type" "application/xml; charset=utf-8"}
                                         :plain-body? true}))]
       (result/success {:documents (load-coll-from-xml (:body response))}))))
@@ -86,33 +85,35 @@
                    data)
           "</"path">")))
 
-(defn change-state [{:keys [id] :as document} data]
+(defn change-state [options {:keys [id] :as document} data]
   {:pre [(some? id)]}
   (go
     (result/enforce-let [response (<! (request-utils/http-put
-                                         {:host (url (str "/"(doc-path document)"s/" id "/change-state.xml"))
+                                         {:host (common/from-path options (str "/"(doc-path document)"s/" id "/change-state.xml"))
                                           :headers {"Content-type" "application/xml; charset=utf-8"}
                                           :plain-body? true
                                           :body (change-state-body document data)}))
-                         document (<! (reload-document document))]
+                         document (<! (reload-document options document))]
         document)))
 
-(defn finalize [document]
-  (change-state document {:state "finalized"}))
+(defn finalize [options document]
+  (change-state options document {:state "finalized"}))
 
-(defn cancel [document & cancel-message]
-  (change-state document {:state "canceled"
-                          :message (or cancel-message "Canceled")}))
+(defn cancel [options document & cancel-message]
+  (change-state options
+                document
+                {:state "canceled"
+                 :message (or cancel-message "Canceled")}))
 
-(defn settle [document]
-  (change-state document {:state "settled"}))
+(defn settle [options document]
+  (change-state options document {:state "settled"}))
 
-(defn delete [document]
-  (change-state document {:state "deleted"}))
+(defn delete [options document]
+  (change-state options document {:state "deleted"}))
 
-(defn set-random-sequence [document]
+(defn set-random-sequence [options document]
   (let[serie (gen/generate (sequences/serie-generator))
-        ixseq (<!! (seq-api/create {:serie serie}))
+        ixseq (<!! (seq-api/create options {:serie serie}))
         seq-id (get ixseq (sequence-key document))
         document (assoc document :sequence_id seq-id)]
     document))

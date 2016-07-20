@@ -1,4 +1,4 @@
-(defproject invoice-spec "0.1.0-SNAPSHOT"
+(defproject invoice-spec "1.0.0"
   :description "FIXME: write description"
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
@@ -6,7 +6,7 @@
 
   :aliases {"autotest" ["trampoline" "with-profile" "+test,+test-deps" "test-refresh"]}
 
-  :dependencies [[org.clojure/clojure "1.9.0-alpha9"]
+  :dependencies [[org.clojure/clojure "1.9.0-alpha10"]
                  [org.clojure/data.xml "0.0.8"]
                  [org.clojure/test.check "0.9.0"]
                  [aleph "0.4.1"]

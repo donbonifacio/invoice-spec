@@ -9,7 +9,6 @@
             [invoice-spec.transitions.transition :as transition]))
 
 (defn validate [invoice receipt]
-  (prn "----- validate receipt" (:status invoice) (:status receipt))
   (let [status "canceled"]
     (cond
 
@@ -33,10 +32,10 @@
 
 (defmethod transition/operate :cancel-last-receipt [context transition]
   (result/enforce-let [document (result/presence (:document context) "no-document")
-                       related (<!! (api/related-documents document))]
+                       related (<!! (api/related-documents context document))]
     (if-let [receipt (last (filter #(= "Receipt" (:type %)) (:documents related)))]
-      (let [canceled (<!! (api/cancel receipt))
-            document (<!! (api/reload-document document))]
+      (let [canceled (<!! (api/cancel context receipt))
+            document (<!! (api/reload-document context document))]
         (if (result/succeeded? canceled)
           (process-success document canceled)
           (transition/process-failure canceled document)))

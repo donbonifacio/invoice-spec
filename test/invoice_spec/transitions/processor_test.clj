@@ -14,15 +14,15 @@
             [invoice-spec.transitions.processor :as processor]))
 
 (deftest create-test
-  (let [document (-> (gen/generate (document/document-generator))
-                     (api/set-random-sequence))
+  (let [document (->> (gen/generate (document/document-generator))
+                      (api/set-random-sequence {}))
         result (processor/run {:document document
                                :transitions [[:create {:offset-days 10}]]})]
     (is (result/succeeded? result))))
 
 (deftest finalize-test
-  (let [document (-> (gen/generate (document/document-generator))
-                     (api/set-random-sequence))
+  (let [document (->> (gen/generate (document/document-generator))
+                      (api/set-random-sequence {}))
         result (processor/run {:document document
                                :transitions [[:create {:offset-days 0}]
                                              [:finalize]]})]
@@ -30,8 +30,8 @@
     (is (= "final" (get-in result [:document :status])))))
 
 (deftest with-invalid-test
-  (let [document (-> (gen/generate (document/document-generator))
-                     (api/set-random-sequence))
+  (let [document (->> (gen/generate (document/document-generator))
+                      (api/set-random-sequence {}))
         result (processor/run {:document document
                                :transitions [[:create {:offset-days 0}]
                                              [:finalize]
@@ -48,9 +48,8 @@
                  create-transition (transition/create-generator)
                  transitions (transition/other-generator)]
                 (let [transitions (concat [create-transition] transitions)
-                      document (-> (gen/generate (document/document-generator))
-                                   (assoc :type document-type)
-                                   (api/set-random-sequence))
+                      document-template (assoc (gen/generate (document/document-generator)) :type document-type)
+                      document (api/set-random-sequence {} document-template)
                       result (processor/run {:document document
                                              :transitions transitions})]
 

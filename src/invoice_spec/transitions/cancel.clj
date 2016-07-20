@@ -22,7 +22,7 @@
 
 (defmethod transition/operate :cancel [context transition]
   (result/on-success [document (result/presence (:document context))]
-    (let [canceled (<!! (api/cancel document))]
+    (let [canceled (<!! (api/cancel context document))]
       (if (result/succeeded? canceled)
         (process-success canceled)
         (transition/process-failure canceled document)))))

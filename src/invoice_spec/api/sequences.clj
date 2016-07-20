@@ -11,11 +11,10 @@
 (def url common/url)
 (def load-from-xml common/load-from-xml)
 
-(defn create
-  [data]
+(defn create [options data]
   (go
     (result/on-success [response (<! (request-utils/http-post
-                                       {:host (url (str "/sequences.xml"))
+                                       {:host (common/from-path options (str "/sequences.xml"))
                                         :headers {"Content-type" "application/xml; charset=utf-8"}
                                         :plain-body? true
                                         :body (str "<sequence>"

@@ -19,41 +19,44 @@
       (s/explain-str :invoice-spec.models.document/document document)))
 
 (deftest create-invoice-cancel-test
+
   (testing "creating an invoice"
-    (let [invoice (-> (document/new-invoice)
-                      (api/set-random-sequence))
-          result (<!! (api/create invoice))]
+    (let [options {}
+          invoice (->> (document/new-invoice)
+                       (api/set-random-sequence options))
+          result (<!! (api/create options invoice))]
       (is (result/succeeded? result))
       (is-valid-document? result)
 
       (testing "finalizing an invoice"
-        (let [result (<!! (api/finalize result))]
+        (let [result (<!! (api/finalize options result))]
           (is (result/succeeded? result))
           (is-valid-document? result)
           (is (= "final" (:status result)))
 
           (testing "canceling an invoice"
-            (let [result (<!! (api/cancel result))]
+            (let [result (<!! (api/cancel options result))]
               (is (result/succeeded? result))
               (is-valid-document? result)
               (is (= "canceled" (:status result))))))))))
 
 (deftest create-invoice-pay-test
   (testing "creating an invoice"
-    (let [invoice (-> (document/new-invoice)
-                      (api/set-random-sequence))
-          result (<!! (api/create invoice))]
+    (let [options {}
+          invoice (->> (document/new-invoice)
+                       (api/set-random-sequence options))
+          result (<!! (api/create options invoice))]
       (is (result/succeeded? result))
       (is-valid-document? result)
 
       (testing "finalizing an invoice"
-        (let [result (<!! (api/finalize result))]
+        (let [result (<!! (api/finalize options result))]
           (is (result/succeeded? result))
           (is-valid-document? result)
           (is (= "final" (:status result)))
 
           (testing "paying an invoice"
-            (let [result (<!! (api/settle result))]
+            (let [result (<!! (api/settle options result))]
               (is (result/succeeded? result))
               (is-valid-document? result)
               (is (= "settled" (:status result))))))))))
@@ -66,29 +69,31 @@
   0
   (prop/for-all [document-type (document/type-generator)
                  document (document/document-generator)]
-                (let [document (-> (assoc document :type document-type)
-                                   (api/set-random-sequence))
-                      created (<!! (api/create document))
-                      final (<!! (api/finalize created))]
+                (let [options {}
+                      document (->> (assoc document :type document-type)
+                                    (api/set-random-sequence options))
+                      created (<!! (api/create options document))
+                      final (<!! (api/finalize options created))]
                   #_(prn (:id final) (:type final) (:sequence_number final))
                   (= (document/expected-final-status document)
                      (:status final)))))
 
 (deftest related-documents-test
-    (let [invoice (-> (document/new-invoice)
-                      (api/set-random-sequence))
-          result (<!! (api/create invoice))]
+    (let [options {}
+          invoice (->> (document/new-invoice)
+                       (api/set-random-sequence options))
+          result (<!! (api/create options invoice))]
       (is (result/succeeded? result))
 
-      (let [result (<!! (api/finalize result))]
+      (let [result (<!! (api/finalize options result))]
         (is (result/succeeded? result))
 
-        (let [result (<!! (api/settle result))]
+        (let [result (<!! (api/settle options result))]
           (is (result/succeeded? result))
           (is (= "settled" (:status result)))
 
           (testing "related documents"
-            (let [result (<!! (api/related-documents result))]
+            (let [result (<!! (api/related-documents options result))]
               (is (result/succeeded? result))
               (is (= 1 (count (:documents result))))
               (is (= "Receipt" (-> result :documents first :type)))

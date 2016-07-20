@@ -14,5 +14,5 @@
 
 (deftest create-sequence-test
   (let [serie (gen/generate (sequences/serie-generator))
-        ixseq (<!! (api/create {:serie serie}))]
+        ixseq (<!! (api/create {} {:serie serie}))]
     (is (result/succeeded? ixseq))))

@@ -18,8 +18,8 @@
 
       :else (result/success))))
 
-(defn validate-receipt [document]
-  (result/on-success [result (<!! (api/related-documents document))]
+(defn validate-receipt [context document]
+  (result/on-success [result (<!! (api/related-documents context document))]
     (let [receipt (last (filter #(= "Receipt" (:type %)) (:documents result)))
           status (document/expected-final-status receipt)]
       (cond
@@ -36,15 +36,15 @@
         :else
           (result/success)))))
 
-(defn process-success [final]
+(defn process-success [context final]
   (result/enforce-let [valid? (document/validate final)
                        valid-logic? (validate final)
-                       receipt-present? (validate-receipt final)]
+                       receipt-present? (validate-receipt context final)]
     (result/success {:document final})))
 
 (defmethod transition/operate :settle [context transition]
   (result/on-success [document (result/presence (:document context))]
-    (let [settled (<!! (api/settle document))]
+    (let [settled (<!! (api/settle context document))]
       (if (result/succeeded? settled)
-        (process-success settled)
+        (process-success context settled)
         (transition/process-failure settled document)))))

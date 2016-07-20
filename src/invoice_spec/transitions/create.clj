@@ -33,7 +33,7 @@
 
 (defmethod transition/operate :create [context transition]
   (result/enforce-let [document (result/presence (:document context))
-                       created (<!! (api/create (set-dates document transition)))
+                       created (<!! (api/create context (set-dates document transition)))
                        valid? (document/validate created)
                        valid-logic? (validate created transition)]
   (result/success {:document created})))
