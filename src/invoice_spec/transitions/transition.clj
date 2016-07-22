@@ -46,6 +46,7 @@
 (s/def ::document-and-transitions
   (s/+ (s/keys :req-un [::create-transitions
                         ::other-transitions
+                        :invoice-spec.models.document/primary-type
                         :invoice-spec.models.document/basic-document])))
 
 (defn document-and-transitions-generator []

@@ -58,3 +58,21 @@
                     (prn "---")
                     (prn result))
                   (result/succeeded? result))))
+
+(defspec document-sequence-transitions
+  0
+  (prop/for-all [document-type (document/type-generator)
+                 create-transition (transition/create-generator)
+                 transitions (transition/other-generator)]
+                (let [transitions (concat [create-transition] transitions)
+                      document (-> (gen/generate (document/document-generator))
+                                   (assoc :type document-type)
+                                   (api/set-random-sequence))
+                      result (processor/run {:document document
+                                             :transitions transitions})]
+
+                  (prn document-type transitions (get-in result [:document :status]))
+                  (when (result/failed? result)
+                    (prn "---")
+                    (prn result))
+                  (result/succeeded? result))))
