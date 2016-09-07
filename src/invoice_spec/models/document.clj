@@ -3,6 +3,7 @@
             [invoice-spec.models.client]
             [invoice-spec.models.item]
             [result.core :as result]
+            [invoice-spec.models.preds :as preds]
             [clojure.spec.gen :as gen]))
 
 (s/def ::document (s/keys :req-un [::sequence_number
@@ -40,13 +41,11 @@
 (s/def ::date (s/with-gen string? #(s/gen #{"01/01/2016"})))
 (s/def ::due_date (s/with-gen string? #(s/gen #{"01/01/2016"})))
 
-(def nat-number? (s/and number? (comp not neg?)))
-
-(s/def ::discount nat-number?)
-(s/def ::sum nat-number?)
-(s/def ::taxes nat-number?)
-(s/def ::total nat-number?)
-(s/def ::before_taxes nat-number?)
+(s/def ::discount preds/nat-number?)
+(s/def ::sum preds/currency?)
+(s/def ::taxes preds/currency?)
+(s/def ::total preds/currency?)
+(s/def ::before_taxes preds/currency?)
 (s/def ::archived boolean?)
 (s/def ::permalink string?)
 (s/def ::reference (s/nilable string?))

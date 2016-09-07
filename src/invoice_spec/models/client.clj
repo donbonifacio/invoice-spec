@@ -1,7 +1,8 @@
 (ns invoice-spec.models.client
   (:require [clojure.spec :as s]
             [clojure.spec.gen :as gen]
-            [invoice-spec.models.client-names :as client-names]))
+            [invoice-spec.models.preds :as preds]
+            [invoice-spec.models.client-names]))
 
 #_(gen/sample (s/gen ::client))
 

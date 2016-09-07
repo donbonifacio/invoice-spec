@@ -80,7 +80,7 @@
     "Dubois"})
 
 (s/def ::first-name (s/with-gen string?
-                   #(s/gen firsk-names)))
+                   #(s/gen first-names)))
 
 (s/def ::last-name (s/with-gen string?
                    #(s/gen last-names)))
@@ -92,6 +92,3 @@
                   (gen/tuple (s/gen ::first-name)
                              (s/gen ::last-name)
                              (s/gen ::last-name)))))
-
-(gen/sample (s/gen ::name))
-

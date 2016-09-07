@@ -6,7 +6,6 @@
 
 (s/def ::name (s/with-gen string?
                 #(s/gen #{"IVA"})))
-(s/def ::id (s/with-gen (s/and integer? pos?)
-              #(s/gen (s/int-in 1 100000))))
-(s/def ::value (s/with-gen number?
-                 #(s/gen (s/int-in 0 100))))
+(s/def ::id nat-int?)
+(s/def ::value (s/with-gen nat-int?
+                 #(s/gen (s/int-in 0 25))))

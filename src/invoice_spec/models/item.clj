@@ -16,8 +16,6 @@
                                ::discount ::discount_amount
                                ::total ::subtotal]))
 
-(def nat-number? (s/and number? (comp not neg?)))
-
 (s/def ::description (s/nilable string?))
 
 (s/def ::quantity preds/quantity-num?)
@@ -25,7 +23,6 @@
 (s/def ::discount (s/or :no-discount (s/with-gen zero? #(s/gen #{0}))
                         :with-discount (s/with-gen (s/and nat-int? #(<= 0 % 100))
                                          #(s/gen (s/int-in 1 100)))))
-(s/def ::discount_amount (s/with-gen nat-number?
-                                     #(s/gen (s/int-in 0 100))))
+(s/def ::discount_amount preds/currency?)
 (s/def ::total preds/currency?)
 (s/def ::subtotal preds/currency?)
