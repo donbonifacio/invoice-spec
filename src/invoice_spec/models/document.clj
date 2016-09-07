@@ -82,6 +82,8 @@
   (-> (random-new)
       (assoc :type "Invoice")))
 
+#_(new-invoice)
+
 (s/fdef new-invoice
   :ret ::document)
 
