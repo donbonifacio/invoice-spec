@@ -8,7 +8,7 @@
 #_(gen/sample (s/gen ::item))
 
 (s/def ::items (s/with-gen (s/+ ::item)
-                           #(gen/vector (s/gen ::item) 1 3)))
+                           #(gen/vector (s/gen ::item) 1 30)))
 
 (s/def ::item (s/keys :req-un [:invoice-spec.models.item-names/name ::description
                                ::quantity ::unit_price]

@@ -121,7 +121,7 @@
 (defn download-pdf [options {:keys [id] :as document}]
   {:pre [(some? id)]}
   (go-loop [tries 0]
-    (if (> tries 20)
+    (if (>= tries 50)
       (result/failure {:tries tries :data "no-response"})
       (result/on-success [response (<! (request-utils/http-get
                                          {:host (common/from-path options (str "/api/pdf/" id ".xml"))

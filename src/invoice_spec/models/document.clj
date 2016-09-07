@@ -16,6 +16,7 @@
                           :opt-un [::saft_hash
                                    ::sequence_id
                                    ::id
+                                   ::retention
                                    ::cancel_reason
                                    ::currency
                                    ::before_taxes]))
@@ -49,6 +50,8 @@
 (s/def ::archived boolean?)
 (s/def ::permalink string?)
 (s/def ::reference (s/nilable string?))
+(s/def ::retention (s/with-gen (s/nilable (s/and nat-int? #(<= 0 % 100)))
+                     #(s/gen (s/int-in 0 99))))
 
 (s/def ::saft_hash (s/and string? #(= 4 (count %))))
 (s/def ::currency #{"Euro"})
