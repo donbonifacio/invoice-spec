@@ -98,3 +98,20 @@
               (is (= 1 (count (:documents result))))
               (is (= "Receipt" (-> result :documents first :type)))
               (is (= "final" (-> result :documents first :status)))))))))
+
+(deftest download-pdf-test
+
+  (testing "creating an invoice"
+    (let [options {}
+          invoice (->> (document/new-invoice)
+                       (api/set-random-sequence options))
+          result (<!! (api/create options invoice))]
+      (is (result/succeeded? result))
+      (is-valid-document? result)
+
+      (let [result (<!! (api/finalize options result))]
+        (is (result/succeeded? result)
+
+          (testing "download the document"
+            (let [result (<!! (api/download-pdf options result))]
+              (is (result/succeeded? result)))))))))

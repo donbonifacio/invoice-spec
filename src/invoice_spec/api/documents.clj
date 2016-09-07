@@ -2,7 +2,7 @@
   (:require [clojure.spec :as s]
             [clojure.spec.gen :as gen]
             [request-utils.core :as request-utils]
-            [clojure.core.async :refer [chan <!! >!! close! go <! timeout]]
+            [clojure.core.async :refer [chan <!! >!! close! go <! timeout go-loop]]
             [invoice-spec.api.common :as common]
             [invoice-spec.models.sequence :as sequences]
             [invoice-spec.api.sequences :as seq-api]
@@ -117,3 +117,18 @@
         seq-id (get ixseq (sequence-key document))
         document (assoc document :sequence_id seq-id)]
     document))
+
+(defn download-pdf [options {:keys [id] :as document}]
+  {:pre [(some? id)]}
+  (go-loop [tries 0]
+    (if (> tries 20)
+      (result/failure {:tries tries :data "no-response"})
+      (result/on-success [response (<! (request-utils/http-get
+                                         {:host (common/from-path options (str "/api/pdf/" id ".xml"))
+                                          :headers {"Content-type" "application/xml; charset=utf-8"}
+                                          :plain-body? true}))]
+        (if (= 202 (:status response))
+          (do
+            (<! (timeout 1000))
+            (recur (inc tries)))
+          (result/success (load-from-xml (:body response))))))))
