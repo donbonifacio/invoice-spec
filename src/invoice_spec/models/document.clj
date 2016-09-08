@@ -15,6 +15,8 @@
                                    :invoice-spec.models.item/items]
                           :opt-un [::saft_hash
                                    ::sequence_id
+                                   ::reference
+                                   ::observations
                                    ::id
                                    ::retention
                                    ::cancel_reason
@@ -56,6 +58,8 @@
 (s/def ::saft_hash (s/and string? #(= 4 (count %))))
 (s/def ::currency #{"Euro"})
 (s/def ::cancel_reason string?)
+(s/def ::reference (s/nilable string?))
+(s/def ::observations (s/nilable string?))
 
 (s/def ::transition #{
                       [:cancel]

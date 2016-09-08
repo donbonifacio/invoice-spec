@@ -1,4 +1,4 @@
-(defproject invoice-spec "1.2.0"
+(defproject invoice-spec "1.3.0"
   :description "FIXME: write description"
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"

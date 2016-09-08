@@ -24,27 +24,40 @@
   (let [path (doc-path document)]
     (keyword (str "current_" path "_sequence_id"))))
 
+(defn optional-element [document prop-key]
+  (if-let [prop-value (get document prop-key)]
+    (xml/element prop-key {} prop-value)))
+
 (defn document-xml [document]
-  (xml/element (keyword (doc-path document)) {}
-               (xml/element :date {} (:date document))
-               (if-let [sequence-number (:sequence_number document)]
-                 (xml/element :sequence_number {} sequence-number))
-               (if-let [sequence-id (:sequence_id document)]
-                 (xml/element :sequence_id {} sequence-id))
-               (xml/element :status {} (:status document))
-               (xml/element :client {}
-                            (xml/element :name {} (get-in document [:client :name]))
-                            (if-let [language (get-in document [:client :language])]
-                              (xml/element :language {} language))
-                            (xml/element :code {} (get-in document [:client :code])))
-               (xml/element :items {:type "array"}
-                  (map (fn [item]
-                         (xml/element :item {}
-                           (xml/element :name {} (:name item))
-                           (xml/element :unit_price {} (:unit_price item))
-                           (xml/element :quantity {} (:quantity item))
-                           (xml/element :description {} (:description item))))
-                       (:items document)))))
+  (let [client (:client document)]
+    (xml/element (keyword (doc-path document)) {}
+                 (xml/element :date {} (:date document))
+                 (optional-element document :sequence_number)
+                 (optional-element document :sequence_id)
+                 (optional-element document :reference)
+                 (optional-element document :observations)
+                 (xml/element :status {} (:status document))
+                 (xml/element :client {}
+                              (xml/element :name {} (:name client))
+                              (optional-element client :email)
+                              (optional-element client :country)
+                              (optional-element client :postal_code)
+                              (optional-element client :address)
+                              (optional-element client :city)
+                              (optional-element client :send_options)
+                              (optional-element client :website)
+                              (optional-element client :phone)
+                              (optional-element client :fax)
+                              (optional-element client :language)
+                              (xml/element :code {} (:code client)))
+                 (xml/element :items {:type "array"}
+                    (map (fn [item]
+                           (xml/element :item {}
+                             (xml/element :name {} (:name item))
+                             (xml/element :unit_price {} (:unit_price item))
+                             (xml/element :quantity {} (:quantity item))
+                             (xml/element :description {} (:description item))))
+                         (:items document))))))
 
 (defn document-xml-str [document]
   (xml/emit-str (document-xml document)))

@@ -14,7 +14,11 @@
                                  ::observations
                                  ::send_options]))
 
-(s/def ::code (s/with-gen string? #(s/gen (->> (range 10) (map (fn [n] (str "Client " n))) (set)))))
+(s/def ::code (s/with-gen string?
+                #(gen/fmap (fn [n]
+                             (str "code" n))
+                           (s/gen (s/int-in 1 1000)))))
+
 (s/def ::email (s/with-gen string?
                  #(gen/fmap (fn [raw]
                               (str "aa" raw "@gmail.com"))
@@ -40,8 +44,6 @@
                                 (str "www." raw ".com"))
                               (gen/string-alphanumeric))))
 
-(s/def ::phone (s/with-gen nat-int?
-                 #(s/gen (s/int-in 100000000 999999999))))
+(s/def ::phone preds/phone?)
 
-(s/def ::fax (s/with-gen nat-int?
-               #(s/gen (s/int-in 100000000 999999999))))
+(s/def ::fax preds/phone?)

@@ -19,3 +19,7 @@
 
 (def currency? quantity-num?)
 
+(def phone? (s/with-gen string?
+                 #(gen/fmap (fn [n]
+                              (str n))
+                            (s/gen (s/int-in 100000000 999999999)))))
