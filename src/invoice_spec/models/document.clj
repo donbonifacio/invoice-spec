@@ -26,7 +26,8 @@
 (s/def ::basic-document
   (s/keys :req-un [::date ::due_date
                    :invoice-spec.models.client/client
-                   :invoice-spec.models.item/items]))
+                   :invoice-spec.models.item/items]
+          :opt-un [::reference ::observations ::retention]))
 
 (s/def ::id nat-int?)
 (s/def ::sequence_id nat-int?)
