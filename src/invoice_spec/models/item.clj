@@ -7,8 +7,13 @@
 
 #_(gen/sample (s/gen ::item))
 
+(def ^:const max-items 2)
+
 (s/def ::items (s/with-gen (s/+ ::item)
-                           #(gen/vector (s/gen ::item) 1 100)))
+                 #(gen/one-of [(gen/vector (s/gen ::item) 1 max-items)
+                               (gen/vector (s/gen ::item-big-description) 1 max-items)])))
+
+#_(gen/generate (s/gen ::items))
 
 (s/def ::item (s/keys :req-un [:invoice-spec.models.item-names/name ::description
                                ::quantity ::unit_price]
@@ -16,7 +21,11 @@
                                ::discount ::discount_amount
                                ::total ::subtotal]))
 
+(s/def ::item-big-description (s/merge ::item
+                                       (s/keys :req-un [:invoice-spec.models.item-big/description])))
+
 (s/def ::description (s/nilable string?))
+(s/def :invoice-spec.models.item-big/description preds/large-string?)
 
 (s/def ::quantity preds/quantity-num?)
 (s/def ::unit_price preds/currency?)

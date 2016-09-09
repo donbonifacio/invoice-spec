@@ -24,17 +24,11 @@
                               (str "aa" raw "@gmail.com"))
                             (gen/string-alphanumeric))))
 
-(s/def ::country (s/with-gen string?
-                   #(s/gen #{"Portugal"})))
-
-(s/def ::postal_code (s/with-gen string?
-                       #(gen/fmap (fn [[part1 part2]]
-                                    (str part1 "-" part2))
-                                  (gen/tuple (s/gen (s/int-in 1000 3000))
-                                             (s/gen (s/int-in 100 300))))))
-(s/def ::address string?)
+(s/def ::country preds/country?)
+(s/def ::postal_code preds/postal-code?)
+(s/def ::address preds/medium-string?)
 (s/def ::city string?)
-(s/def ::observations string?)
+(s/def ::observations preds/large-string?)
 (s/def ::language #{"en" "pt" "es"})
 (s/def ::send_options (s/with-gen nat-int?
                         #(s/gen #{1 2 3})))

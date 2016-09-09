@@ -23,15 +23,17 @@
                                    ::currency
                                    ::before_taxes]))
 
-(s/def ::basic-document
-  (s/keys :req-un [::date ::due_date
-                   :invoice-spec.models.client/client
-                   :invoice-spec.models.item/items]
-          :opt-un [::reference ::observations ::retention]))
+(s/def ::guide (s/merge ::document
+                        (s/keys :req-un [:invoice-spec.models.guide/type
+                                         :invoice-spec.models.guide/loaded_at
+                                         :invoice-spec.models.address/address_to
+                                         :invoice-spec.models.address/address_from]
+                                :opt-un [:invoice-spec.models.guide/license_plate])))
 
 (s/def ::id nat-int?)
 (s/def ::sequence_id nat-int?)
-(s/def ::type #{"Invoice" "SimplifiedInvoice" "InvoiceReceipt" "CreditNode" "DebitNote" "Receipt"})
+(s/def ::type #{"Invoice" "SimplifiedInvoice" "InvoiceReceipt" "CreditNode" "DebitNote" "Receipt" "Transport" "Devolution" "Shipping"})
+(s/def :invoice-spec.models.guide/type #{"Transport" "Devolution" "Shipping"})
 (s/def ::primary-type #{"Invoice" "InvoiceReceipt" "SimplifiedInvoice"})
 (s/def ::status #{"draft" "deleted" "final" "settled" "canceled"})
 
@@ -44,8 +46,10 @@
                            #(s/gen #{"draft"})))
 (s/def ::date (s/with-gen string? #(s/gen #{"01/01/2016"})))
 (s/def ::due_date (s/with-gen string? #(s/gen #{"01/01/2016"})))
+(s/def :invoice-spec.models.guide/loaded_at (s/with-gen string? #(s/gen #{"01/01/2016 19:00:00"})))
+(s/def :invoice-spec.models.guide/license_plate (s/with-gen string? #(s/gen #{"EI-12-12"})))
 
-(s/def ::discount preds/nat-number?)
+(s/def ::discount preds/currency?)
 (s/def ::sum preds/currency?)
 (s/def ::taxes preds/currency?)
 (s/def ::total preds/currency?)
@@ -60,7 +64,7 @@
 (s/def ::currency #{"Euro"})
 (s/def ::cancel_reason string?)
 (s/def ::reference (s/nilable string?))
-(s/def ::observations (s/nilable string?))
+(s/def ::observations (s/nilable preds/medium-string?))
 
 (s/def ::transition #{
                       [:cancel]
@@ -71,8 +75,28 @@
 (s/def ::transitions (s/with-gen (s/+ ::transition)
                                  #(gen/vector (s/gen ::transition) 1 5)))
 
+
+(s/def ::basic-document
+  (s/keys :req-un []
+          :opt-un []))
+
+(def fields-for-create [;; global
+                        :date :due_date
+                        :type
+                        :client
+                        :items
+                        :reference :observations :retention
+
+                        ;; guides
+                        :loaded_at
+                        :license_plate
+                        :address_to
+                        :address_from])
+
 (defn document-generator []
-  (s/gen ::basic-document))
+  (gen/fmap (fn [document]
+              (select-keys document fields-for-create))
+            (s/gen ::document)))
 
 (defn type-generator []
   (s/gen ::primary-type))
