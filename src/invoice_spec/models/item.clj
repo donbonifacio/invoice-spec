@@ -5,15 +5,15 @@
             [invoice-spec.models.item-names]
             [invoice-spec.models.tax :as tax]))
 
-#_(gen/sample (s/gen ::item))
+#_(gen/generate (s/gen ::item))
+#_(gen/generate (s/gen ::items))
+#_(s/explain ::item {:name "waza" :description "waza" :quantity 1 :unit_price 1})
 
 (def ^:const max-items 2)
 
 (s/def ::items (s/with-gen (s/+ ::item)
                  #(gen/one-of [(gen/vector (s/gen ::item) 1 max-items)
                                (gen/vector (s/gen ::item-big-description) 1 max-items)])))
-
-#_(gen/generate (s/gen ::items))
 
 (s/def ::item (s/keys :req-un [:invoice-spec.models.item-names/name ::description
                                ::quantity ::unit_price]

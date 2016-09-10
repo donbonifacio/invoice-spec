@@ -13,6 +13,8 @@
             [clojure.test.check.clojure-test :refer [defspec]]
             [invoice-spec.transitions.processor :as processor]))
 
+(comment
+
 (deftest create-test
   (let [document (->> (gen/generate (document/document-generator))
                       (api/set-random-sequence {}))
@@ -76,3 +78,5 @@
                     (prn "---")
                     (prn result))
                   (result/succeeded? result))))
+
+)

@@ -18,6 +18,7 @@
   (is (s/valid? :invoice-spec.models.document/document document)
       (s/explain-str :invoice-spec.models.document/document document)))
 
+(comment
 (deftest create-invoice-cancel-test
 
   (testing "creating an invoice"
@@ -115,3 +116,6 @@
           (testing "download the document"
             (let [result (<!! (api/download-pdf options result))]
               (is (result/succeeded? result)))))))))
+
+
+)

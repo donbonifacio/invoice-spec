@@ -12,7 +12,7 @@
             [result.core :as result]
             [clojure.data.xml :as xml]))
 
-(deftest create-sequence-test
+#_(deftest create-sequence-test
   (let [serie (gen/generate (sequences/serie-generator))
         ixseq (<!! (api/create {} {:serie serie}))]
     (is (result/succeeded? ixseq))))
