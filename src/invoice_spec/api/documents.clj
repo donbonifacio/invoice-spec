@@ -18,6 +18,7 @@
     (= "InvoiceReceipt" (:type document)) "invoice_receipt"
     (= "SimplifiedInvoice" (:type document)) "simplified_invoice"
     (= "Receipt" (:type document)) "receipt"
+    (= "Quote" (:type document)) "quote"
     :else "invoice"))
 
 (defn sequence-key [document]
